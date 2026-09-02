@@ -20,7 +20,7 @@ jobs:
       - name: Rebuild and verify PNG
         shell: bash
         run: |
-          if [ ! -f .sprite-chunks/part-00 ]; then
+          if ! compgen -G ".sprite-chunks/part-*" > /dev/null; then
             echo "No sprite chunks; nothing to rebuild."
             exit 0
           fi

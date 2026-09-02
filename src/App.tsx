@@ -1,5 +1,4 @@
 import { CSSProperties, FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { PetFaceOverlay } from "./components/PetFaceOverlay";
 import { usePetAnimation } from "./hooks/usePetAnimation";
 import { usePetExpression, type PetMode } from "./hooks/usePetExpression";
 import { askAssistant } from "./lib/assistant";
@@ -40,7 +39,7 @@ export default function App() {
   const [launchAtLogin, setLaunchAtLogin] = useState(false);
   const [launchAtLoginSupported, setLaunchAtLoginSupported] = useState(false);
   const { ambient, ambientDurationMs, reaction, triggerReaction } = usePetAnimation(thinking);
-  const { face, mood } = usePetExpression(mode, thinking, reaction);
+  const { pose, mood } = usePetExpression(mode, thinking, reaction);
 
   const modeLabel = useMemo(
     () => ({ idle: "待机中", focus: "专注中", rest: "休息中" })[mode],
@@ -221,7 +220,7 @@ export default function App() {
           <header>
             <div>
               <strong>设置</strong>
-              <span>V0.3-B expressions</span>
+              <span>V0.3-C multipose</span>
             </div>
             <button className="panel-close" onClick={() => setPanel("none")} aria-label="关闭设置">×</button>
           </header>
@@ -251,14 +250,18 @@ export default function App() {
           <span className={`pet-ambient ambient-${ambient}`} style={ambientStyle}>
             <span className={`pet-reaction ${reactionClass}`}>
               <span className="pet-hover-layer">
-                <span className={`pet-expression-layer mood-${mood} face-${face}`}>
-                  <img
-                    className="pet-image"
-                    src="/assets/pet.png"
-                    alt="Q 版 Codex 桌宠"
-                    draggable={false}
+                <span className={`pet-pose-layer mood-${mood}`}>
+                  <span
+                    className={`pet-sprite pose-${pose}`}
+                    key={pose}
+                    aria-hidden="true"
                   />
-                  <PetFaceOverlay face={face} mood={mood} />
+                  {mood === "thinking" && <span className="pet-expression-fx fx-thinking">•••</span>}
+                  {mood === "rest" && <span className="pet-expression-fx fx-sleep">Zzz</span>}
+                  {mood === "focus" && <span className="pet-expression-fx fx-focus">⌁</span>}
+                  {(mood === "happy" || mood === "success") && (
+                    <span className="pet-expression-fx fx-sparkle">✦</span>
+                  )}
                 </span>
               </span>
             </span>

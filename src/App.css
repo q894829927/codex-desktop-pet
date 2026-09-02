@@ -6,7 +6,7 @@ html,
 body,
 #root {
   width: 100%;
-  height: 100%;
+  min-height: 0;
   margin: 0;
   overflow: hidden;
   background: transparent !important;
@@ -30,7 +30,12 @@ button {
 .pet-shell {
   position: relative;
   width: 100%;
-  height: 100%;
+  min-height: 0;
+  padding: 8px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   background: transparent;
   -webkit-app-region: drag;
 }
@@ -41,7 +46,7 @@ button {
 
 .drag-handle {
   position: absolute;
-  top: 8px;
+  top: 6px;
   right: 8px;
   z-index: 40;
   width: 30px;
@@ -59,12 +64,10 @@ button {
 }
 
 .bubble {
-  position: absolute;
-  top: 38px;
-  left: 50%;
+  position: relative;
   z-index: 24;
   width: 248px;
-  transform: translateX(-50%);
+  margin-top: 28px;
   padding: 10px 12px;
   text-align: left;
   border: 1px solid rgba(255, 255, 255, 0.9);
@@ -105,12 +108,13 @@ button {
 }
 
 .pet-stage {
-  position: absolute;
-  inset: 92px 28px 12px;
+  position: relative;
   z-index: 10;
+  width: 100%;
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  padding: 4px 42px 0;
   pointer-events: none;
 }
 
@@ -128,7 +132,6 @@ button {
   display: block;
   width: 190px;
   max-width: 100%;
-  max-height: 438px;
   height: auto;
   object-fit: contain;
   transform-origin: 50% 100%;
@@ -147,8 +150,8 @@ button {
 
 .menu-toggle {
   position: absolute;
-  right: 12px;
-  bottom: 14px;
+  right: 10px;
+  bottom: 10px;
   z-index: 42;
   width: 38px;
   height: 38px;
@@ -172,8 +175,8 @@ button {
 
 .quick-menu {
   position: absolute;
-  right: 12px;
-  bottom: 60px;
+  right: 10px;
+  bottom: 54px;
   z-index: 41;
   width: 126px;
   padding: 8px;
@@ -210,7 +213,7 @@ button {
 .panel {
   position: absolute;
   left: 50%;
-  bottom: 58px;
+  bottom: 54px;
   z-index: 35;
   width: 286px;
   transform: translateX(-50%);
@@ -256,7 +259,7 @@ button {
 }
 
 .chat-list {
-  max-height: 190px;
+  max-height: 132px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;

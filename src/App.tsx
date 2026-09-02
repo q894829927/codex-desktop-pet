@@ -10,7 +10,7 @@ type ChatMessage = { role: "user" | "assistant"; text: string };
 
 const texts: Record<Mode, string[]> = {
   idle: [
-    "你好呀，我是你的 Codex 桌宠。",
+    "我是大笨猪徐倩岚。",
     "今天准备写点什么？",
     "点我一下，我会陪你说两句。",
     "我会安静待在桌面上。",
@@ -182,7 +182,7 @@ export default function App() {
 
       {showBubble && panel === "none" && (
         <button className="bubble no-drag" onClick={() => setShowBubble(false)}>
-          <span className="bubble-title">Codex Pet · {modeLabel}</span>
+          <span className="bubble-title">徐倩岚 · {modeLabel}</span>
           <span className="bubble-text">{message}</span>
         </button>
       )}
@@ -246,7 +246,7 @@ export default function App() {
           className={`pet-button no-drag mode-${mode}`}
           onClick={handlePetClick}
           onDoubleClick={handlePetDoubleClick}
-          aria-label="点击桌宠"
+          aria-label="点击徐倩岚"
         >
           <span className={`pet-ambient ambient-${ambient}`} style={ambientStyle}>
             <span className={`pet-reaction ${reactionClass}`}>
@@ -255,7 +255,7 @@ export default function App() {
                   <img
                     className="pet-image"
                     src="/assets/pet.png"
-                    alt="Q 版 Codex 桌宠"
+                    alt="Q 版桌宠徐倩岚"
                     draggable={false}
                   />
                   <PetFaceOverlay face={face} mood={mood} />

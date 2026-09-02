@@ -2,8 +2,8 @@ const { app, BrowserWindow, Menu, Tray, ipcMain, nativeImage, screen } = require
 const fs = require("node:fs");
 const path = require("node:path");
 
-const WINDOW_WIDTH = 360;
-const WINDOW_HEIGHT = 620;
+const WINDOW_WIDTH = 320;
+const WINDOW_HEIGHT = 560;
 const DEV_URL = process.env.VITE_DEV_SERVER_URL || "http://127.0.0.1:5173";
 
 let mainWindow = null;

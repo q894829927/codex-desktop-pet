@@ -1,55 +1,41 @@
 .pet-pose-layer {
   position: relative;
   display: block;
-  width: 220px;
-  height: 220px;
+  width: 192px;
+  height: 288px;
   max-width: 100%;
   line-height: 0;
 }
 
 .pet-sprite {
   display: block;
-  width: 220px;
-  height: 220px;
+  width: 192px;
+  height: 288px;
   max-width: 100%;
-  background-image: url("/assets/pet/poses.png?v=2");
+  background-image: url("/assets/pet/poses14.webp?v=source-material-1");
   background-repeat: no-repeat;
-  background-size: 600% 100%;
+  background-size: 1344px 576px;
+  background-position: 0 0;
   transform-origin: 50% 100%;
   filter: drop-shadow(0 10px 14px rgba(46, 29, 34, 0.17));
   animation: pet-pose-enter 130ms ease-out both;
   image-rendering: auto;
 }
 
-.pose-idle {
-  background-position: 0% 0;
-  transform: scale(1.1);
-}
-
-.pose-blink {
-  background-position: 20% 0;
-  transform: scale(1.02);
-}
-
-.pose-thinking {
-  background-position: 40% 0;
-  transform: scale(1.03);
-}
-
-.pose-happy {
-  background-position: 60% 0;
-  transform: scale(1.02);
-}
-
-.pose-success {
-  background-position: 80% 0;
-  transform: scale(1.02);
-}
-
-.pose-rest {
-  background-position: 100% 0;
-  transform: scale(1.03) translateY(3px);
-}
+.pose-idle-1 { background-position: 0 0; }
+.pose-idle-2 { background-position: -192px 0; }
+.pose-idle-3 { background-position: -384px 0; }
+.pose-blink { background-position: -576px 0; }
+.pose-blink-half { background-position: -768px 0; }
+.pose-thinking { background-position: -960px 0; }
+.pose-happy { background-position: -1152px 0; }
+.pose-wave { background-position: 0 -288px; }
+.pose-excited { background-position: -192px -288px; }
+.pose-success { background-position: -384px -288px; }
+.pose-tap { background-position: -576px -288px; }
+.pose-double-jump { background-position: -768px -288px; }
+.pose-sleepy { background-position: -960px -288px; }
+.pose-rest { background-position: -1152px -288px; }
 
 .pet-expression-fx {
   position: absolute;
@@ -58,6 +44,10 @@
   line-height: 1;
   user-select: none;
   text-shadow: 0 2px 7px rgba(64, 38, 49, 0.2);
+}
+
+.pet-pose-layer:has(.pose-sleepy) .fx-sleep {
+  display: none;
 }
 
 .fx-thinking {

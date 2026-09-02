@@ -11,6 +11,7 @@ declare global {
     petAPI: {
       hide: () => Promise<void>;
       quit: () => Promise<void>;
+      resizeContent: (height: number) => Promise<number | null>;
       getSettings: () => Promise<PetSettings>;
       setAlwaysOnTop: (enabled: boolean) => Promise<boolean>;
       setLaunchAtLogin: (

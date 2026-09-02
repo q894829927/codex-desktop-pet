@@ -1,8 +1,10 @@
 import { CSSProperties, FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { PetFaceOverlay } from "./components/PetFaceOverlay";
 import { usePetAnimation } from "./hooks/usePetAnimation";
+import { usePetExpression, type PetMode } from "./hooks/usePetExpression";
 import { askAssistant } from "./lib/assistant";
 
-type Mode = "idle" | "focus" | "rest";
+type Mode = PetMode;
 type Panel = "none" | "chat" | "settings";
 type ChatMessage = { role: "user" | "assistant"; text: string };
 
@@ -38,6 +40,7 @@ export default function App() {
   const [launchAtLogin, setLaunchAtLogin] = useState(false);
   const [launchAtLoginSupported, setLaunchAtLoginSupported] = useState(false);
   const { ambient, ambientDurationMs, reaction, triggerReaction } = usePetAnimation(thinking);
+  const { face, mood } = usePetExpression(mode, thinking, reaction);
 
   const modeLabel = useMemo(
     () => ({ idle: "待机中", focus: "专注中", rest: "休息中" })[mode],
@@ -218,7 +221,7 @@ export default function App() {
           <header>
             <div>
               <strong>设置</strong>
-              <span>V0.3-A motion</span>
+              <span>V0.3-B expressions</span>
             </div>
             <button className="panel-close" onClick={() => setPanel("none")} aria-label="关闭设置">×</button>
           </header>
@@ -248,12 +251,15 @@ export default function App() {
           <span className={`pet-ambient ambient-${ambient}`} style={ambientStyle}>
             <span className={`pet-reaction ${reactionClass}`}>
               <span className="pet-hover-layer">
-                <img
-                  className="pet-image"
-                  src="/assets/pet.png"
-                  alt="Q 版 Codex 桌宠"
-                  draggable={false}
-                />
+                <span className={`pet-expression-layer mood-${mood} face-${face}`}>
+                  <img
+                    className="pet-image"
+                    src="/assets/pet.png"
+                    alt="Q 版 Codex 桌宠"
+                    draggable={false}
+                  />
+                  <PetFaceOverlay face={face} mood={mood} />
+                </span>
               </span>
             </span>
           </span>

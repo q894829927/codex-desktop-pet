@@ -132,7 +132,7 @@ function createWindow() {
 
   mainWindow = new BrowserWindow({
     ...bounds,
-    title: "Codex Desktop Pet",
+    title: "徐倩岚",
     frame: false,
     transparent: true,
     backgroundColor: "#00000000",
@@ -193,7 +193,7 @@ function createTray() {
   const icon = source.isEmpty() ? nativeImage.createEmpty() : source.resize({ width: 24, height: 24 });
 
   tray = new Tray(icon);
-  tray.setToolTip("Codex Desktop Pet");
+  tray.setToolTip("徐倩岚");
 
   tray.setContextMenu(
     Menu.buildFromTemplate([

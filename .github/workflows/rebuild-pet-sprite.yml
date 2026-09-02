@@ -52,3 +52,5 @@ jobs:
           git add public/assets/pet/poses.png
           git commit -m "fix: rebuild complete multipose sprite"
           git push origin HEAD:fix/full-multipose-sprite
+
+# Trigger after all verified chunks are present.

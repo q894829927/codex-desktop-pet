@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { askAssistant } from "./lib/assistant";
 
 type Mode = "idle" | "focus" | "rest";
@@ -21,6 +21,7 @@ function pick<T>(items: T[]): T {
 }
 
 export default function App() {
+  const shellRef = useRef<HTMLElement>(null);
   const [mode, setMode] = useState<Mode>("idle");
   const [message, setMessage] = useState(texts.idle[0]);
   const [showBubble, setShowBubble] = useState(true);
@@ -46,6 +47,30 @@ export default function App() {
       setLaunchAtLogin(settings.launchAtLogin);
       setLaunchAtLoginSupported(settings.launchAtLoginSupported);
     });
+  }, []);
+
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+
+    let animationFrame = 0;
+
+    const syncWindowHeight = () => {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(() => {
+        const height = Math.ceil(shell.getBoundingClientRect().height);
+        if (height > 0) void window.petAPI.resizeContent(height);
+      });
+    };
+
+    const observer = new ResizeObserver(syncWindowHeight);
+    observer.observe(shell);
+    syncWindowHeight();
+
+    return () => {
+      observer.disconnect();
+      window.cancelAnimationFrame(animationFrame);
+    };
   }, []);
 
   useEffect(() => {
@@ -107,7 +132,7 @@ export default function App() {
   }
 
   return (
-    <main className="pet-shell">
+    <main className="pet-shell" ref={shellRef}>
       <div className="drag-handle" title="拖动桌宠">⋮⋮</div>
 
       {showBubble && panel === "none" && (

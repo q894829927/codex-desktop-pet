@@ -3,7 +3,9 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const WINDOW_WIDTH = 320;
-const WINDOW_HEIGHT = 560;
+const DEFAULT_WINDOW_HEIGHT = 390;
+const MIN_WINDOW_HEIGHT = 280;
+const MAX_WINDOW_HEIGHT = 560;
 const DEV_URL = process.env.VITE_DEV_SERVER_URL || "http://127.0.0.1:5173";
 
 let mainWindow = null;
@@ -15,6 +17,10 @@ let appState = {
   bounds: null,
   alwaysOnTop: true,
 };
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
 
 function readState() {
   if (!stateFile || !fs.existsSync(stateFile)) return;
@@ -49,9 +55,9 @@ function defaultBounds() {
   const workArea = screen.getPrimaryDisplay().workArea;
   return {
     width: WINDOW_WIDTH,
-    height: WINDOW_HEIGHT,
+    height: DEFAULT_WINDOW_HEIGHT,
     x: workArea.x + workArea.width - WINDOW_WIDTH - 24,
-    y: workArea.y + workArea.height - WINDOW_HEIGHT - 24,
+    y: workArea.y + workArea.height - DEFAULT_WINDOW_HEIGHT - 24,
   };
 }
 
@@ -69,11 +75,15 @@ function safeBounds(saved) {
     return defaultBounds();
   }
 
+  const savedHeight = Number.isFinite(saved.height)
+    ? clamp(Math.round(saved.height), MIN_WINDOW_HEIGHT, MAX_WINDOW_HEIGHT)
+    : DEFAULT_WINDOW_HEIGHT;
+
   const candidate = {
     x: Math.round(saved.x),
     y: Math.round(saved.y),
     width: WINDOW_WIDTH,
-    height: WINDOW_HEIGHT,
+    height: savedHeight,
   };
 
   const visible = screen
@@ -81,6 +91,32 @@ function safeBounds(saved) {
     .some((display) => intersects(candidate, display.workArea));
 
   return visible ? candidate : defaultBounds();
+}
+
+function resizeWindowToContent(requestedHeight) {
+  if (!mainWindow || !Number.isFinite(requestedHeight)) return null;
+
+  const height = clamp(Math.ceil(requestedHeight), MIN_WINDOW_HEIGHT, MAX_WINDOW_HEIGHT);
+  const current = mainWindow.getBounds();
+  if (Math.abs(current.height - height) < 2) return current.height;
+
+  const display = screen.getDisplayMatching(current);
+  const workArea = display.workArea;
+  const bottom = current.y + current.height;
+  const maxX = workArea.x + workArea.width - WINDOW_WIDTH;
+  const maxY = workArea.y + workArea.height - height;
+
+  const nextBounds = {
+    x: clamp(current.x, workArea.x, maxX),
+    y: clamp(bottom - height, workArea.y, maxY),
+    width: WINDOW_WIDTH,
+    height,
+  };
+
+  mainWindow.setBounds(nextBounds, false);
+  appState.bounds = mainWindow.getBounds();
+  scheduleStateWrite();
+  return height;
 }
 
 function petAssetPath() {
@@ -125,6 +161,12 @@ function createWindow() {
   }
 
   mainWindow.on("move", () => {
+    if (!mainWindow) return;
+    appState.bounds = mainWindow.getBounds();
+    scheduleStateWrite();
+  });
+
+  mainWindow.on("resize", () => {
     if (!mainWindow) return;
     appState.bounds = mainWindow.getBounds();
     scheduleStateWrite();
@@ -192,6 +234,8 @@ function registerIpc() {
     isQuitting = true;
     app.quit();
   });
+
+  ipcMain.handle("pet:resize-content", (_event, height) => resizeWindowToContent(Number(height)));
 
   ipcMain.handle("pet:get-settings", () => ({
     alwaysOnTop: appState.alwaysOnTop,

@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { CSSProperties, FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { usePetAnimation } from "./hooks/usePetAnimation";
 import { askAssistant } from "./lib/assistant";
 
 type Mode = "idle" | "focus" | "rest";
@@ -22,6 +23,7 @@ function pick<T>(items: T[]): T {
 
 export default function App() {
   const shellRef = useRef<HTMLElement>(null);
+  const clickTimerRef = useRef<number | null>(null);
   const [mode, setMode] = useState<Mode>("idle");
   const [message, setMessage] = useState(texts.idle[0]);
   const [showBubble, setShowBubble] = useState(true);
@@ -35,10 +37,16 @@ export default function App() {
   const [alwaysOnTop, setAlwaysOnTop] = useState(true);
   const [launchAtLogin, setLaunchAtLogin] = useState(false);
   const [launchAtLoginSupported, setLaunchAtLoginSupported] = useState(false);
+  const { ambient, ambientDurationMs, reaction, triggerReaction } = usePetAnimation(thinking);
 
   const modeLabel = useMemo(
     () => ({ idle: "待机中", focus: "专注中", rest: "休息中" })[mode],
     [mode],
+  );
+
+  const ambientStyle = useMemo(
+    () => ({ "--pet-ambient-duration": `${ambientDurationMs}ms` }) as CSSProperties,
+    [ambientDurationMs],
   );
 
   useEffect(() => {
@@ -82,8 +90,36 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [mode, panel]);
 
-  function petClick() {
+  useEffect(
+    () => () => {
+      if (clickTimerRef.current !== null) window.clearTimeout(clickTimerRef.current);
+    },
+    [],
+  );
+
+  function runSinglePetClick() {
+    triggerReaction("tap", 470);
     setMessage(pick(texts[mode]));
+    setShowBubble(true);
+    setPanel("none");
+  }
+
+  function handlePetClick() {
+    if (clickTimerRef.current !== null) window.clearTimeout(clickTimerRef.current);
+    clickTimerRef.current = window.setTimeout(() => {
+      clickTimerRef.current = null;
+      runSinglePetClick();
+    }, 220);
+  }
+
+  function handlePetDoubleClick() {
+    if (clickTimerRef.current !== null) {
+      window.clearTimeout(clickTimerRef.current);
+      clickTimerRef.current = null;
+    }
+
+    triggerReaction("happy", 820);
+    setMessage("嘿嘿，今天也一起加油～");
     setShowBubble(true);
     setPanel("none");
   }
@@ -111,12 +147,16 @@ export default function App() {
     setThinking(true);
     setChat((current) => [...current, { role: "user", text: prompt }]);
 
+    let succeeded = false;
+
     try {
       const reply = await askAssistant(prompt);
       setChat((current) => [...current, { role: "assistant", text: reply.text }]);
-      setMessage("我已经回你啦。");
+      setMessage("任务完成啦。");
+      succeeded = true;
     } finally {
       setThinking(false);
+      if (succeeded) triggerReaction("success", 920);
     }
   }
 
@@ -130,6 +170,8 @@ export default function App() {
     setLaunchAtLogin(result.enabled);
     setLaunchAtLoginSupported(result.supported);
   }
+
+  const reactionClass = thinking ? "reaction-thinking" : `reaction-${reaction}`;
 
   return (
     <main className="pet-shell" ref={shellRef}>
@@ -176,7 +218,7 @@ export default function App() {
           <header>
             <div>
               <strong>设置</strong>
-              <span>V0.2 compact</span>
+              <span>V0.3-A motion</span>
             </div>
             <button className="panel-close" onClick={() => setPanel("none")} aria-label="关闭设置">×</button>
           </header>
@@ -197,13 +239,24 @@ export default function App() {
       )}
 
       <div className="pet-stage">
-        <button className="pet-button no-drag" onClick={petClick} aria-label="点击桌宠">
-          <img
-            className={`pet-image mode-${mode}`}
-            src="/assets/pet.png"
-            alt="Q 版 Codex 桌宠"
-            draggable={false}
-          />
+        <button
+          className={`pet-button no-drag mode-${mode}`}
+          onClick={handlePetClick}
+          onDoubleClick={handlePetDoubleClick}
+          aria-label="点击桌宠"
+        >
+          <span className={`pet-ambient ambient-${ambient}`} style={ambientStyle}>
+            <span className={`pet-reaction ${reactionClass}`}>
+              <span className="pet-hover-layer">
+                <img
+                  className="pet-image"
+                  src="/assets/pet.png"
+                  alt="Q 版 Codex 桌宠"
+                  draggable={false}
+                />
+              </span>
+            </span>
+          </span>
         </button>
       </div>
 

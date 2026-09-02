@@ -12,7 +12,7 @@
   width: 220px;
   height: 220px;
   max-width: 100%;
-  background-image: url("/assets/pet/poses.png");
+  background-image: url("/assets/pet/poses.png?v=2");
   background-repeat: no-repeat;
   background-size: 600% 100%;
   transform-origin: 50% 100%;

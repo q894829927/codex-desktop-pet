@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import type { PetReaction } from "./usePetAnimation";
 
 export type PetMode = "idle" | "focus" | "rest";
-export type PetFace = "normal" | "blink" | "wink" | "sleepy";
+export type PetPose = "idle" | "blink" | "thinking" | "happy" | "success" | "rest";
 export type PetMood = "idle" | "focus" | "rest" | "thinking" | "happy" | "success";
 
 type PetExpressionSnapshot = {
-  face: PetFace;
+  pose: PetPose;
   mood: PetMood;
 };
 
@@ -40,7 +40,15 @@ export function usePetExpression(
     };
 
     const scheduleNext = () => {
-      if (disposed || mode === "rest" || reaction === "happy" || reaction === "success") return;
+      if (
+        disposed ||
+        thinking ||
+        mode === "rest" ||
+        reaction === "happy" ||
+        reaction === "success"
+      ) {
+        return;
+      }
 
       scheduleTimer.current = window.setTimeout(() => {
         const closeFor = randomBetween(88, 128);
@@ -74,17 +82,19 @@ export function usePetExpression(
       disposed = true;
       clearTimers();
     };
-  }, [mode, reaction]);
+  }, [mode, reaction, thinking]);
 
   let mood: PetMood = mode;
   if (thinking) mood = "thinking";
   else if (reaction === "success") mood = "success";
   else if (reaction === "happy") mood = "happy";
 
-  let face: PetFace = "normal";
-  if (mood === "rest") face = "sleepy";
-  else if (mood === "success" || mood === "happy") face = "wink";
-  else if (blinkActive) face = "blink";
+  let pose: PetPose = "idle";
+  if (mood === "thinking") pose = "thinking";
+  else if (mood === "success") pose = "success";
+  else if (mood === "happy") pose = "happy";
+  else if (mood === "rest") pose = "rest";
+  else if (blinkActive) pose = "blink";
 
-  return { face, mood };
+  return { pose, mood };
 }
